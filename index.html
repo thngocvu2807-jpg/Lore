@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="vi" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lore Vision & VIP Translator - Đọc Tự Do, Dịch Thuật AI & Audio Nền</title>
-  <meta name="description" content="Nền tảng đọc truyện tự do, dịch thuật ngữ cảnh AI đa trạm, nghe Audio nền 24/7, mắt thần diệt quảng cáo và hệ sinh thái UserScript không giới hạn." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lore Vision - Trình Duyệt Đọc Truyện & Dịch Thuật AI Đỉnh Cao Cho Android</title>
+  <meta name="description" content="Tải ngay Lore Vision: Đọc mọi nguồn web tự do, Dịch AI nhớ ngữ cảnh, Nghe Podcast Audio nền 24/7 khi tắt máy, diệt sạch quảng cáo và tự do viết Tool JS." />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,18 +14,19 @@
       theme: {
         extend: {
           colors: {
-            obsidian: '#070B13',
-            surface: '#0F172A',
-            card: '#162036',
+            appDark: '#070A11',
+            appSurface: '#0F1626',
+            appCard: '#151F36',
+            appBorder: '#1E2D4A',
             neonCyan: '#38BDF8',
-            neonPurple: '#7B61FF',
-            neonEmerald: '#10B981',
-            neonAmber: '#FDE047',
+            neonPurple: '#818CF8',
+            neonEmerald: '#34D399',
+            neonGold: '#FBBF24',
             neonRose: '#F43F5E'
           },
           fontFamily: {
-            serif: ['Merriweather', 'serif'],
-            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
           }
         }
       }
@@ -35,479 +36,191 @@
   <!-- Google Fonts & Lucide Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- JSZip (Dùng để giải nén file EPUB trực tiếp trên client) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
   <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #070B13;
-      color: #F8FAFC;
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #070A11; }
+    .glow-cyan { box-shadow: 0 0 40px -10px rgba(56, 189, 248, 0.3); }
+    .glow-purple { box-shadow: 0 0 40px -10px rgba(129, 140, 248, 0.3); }
+    .bg-grid {
+      background-size: 32px 32px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     }
-    .glow-cyan {
-      box-shadow: 0 0 35px -5px rgba(56, 189, 248, 0.35);
-    }
-    .glow-purple {
-      box-shadow: 0 0 35px -5px rgba(123, 97, 255, 0.35);
-    }
-    .bg-grid-pattern {
-      background-size: 40px 40px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #070B13; }
-    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
   </style>
 </head>
-<body class="bg-obsidian text-slate-100 min-h-screen relative overflow-x-hidden">
+<body class="text-slate-100 min-h-screen bg-appDark bg-grid pb-24 md:pb-12 antialiased selection:bg-neonCyan/30 selection:text-white">
 
   <!-- ========================================================================= -->
-  <!-- 1. NAVBAR                                                                 -->
+  <!-- 1. HEADER / NAVBAR                                                        -->
   <!-- ========================================================================= -->
-  <nav class="sticky top-0 z-50 backdrop-blur-md bg-obsidian/80 border-b border-slate-800/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Logo -->
-      <a href="#" class="flex items-center space-x-2">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-neonPurple to-neonCyan flex items-center justify-center font-black text-slate-900 shadow-md">
+  <header class="sticky top-0 z-50 bg-appDark/90 backdrop-blur-lg border-b border-appBorder/80 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-neonPurple to-neonCyan flex items-center justify-center font-black text-slate-950 text-xs shadow-lg">
           L✦R
         </div>
-        <div class="flex flex-col">
-          <span class="font-extrabold text-base tracking-wider text-white">LORE VISION</span>
-          <span class="text-[9px] text-neonCyan tracking-widest uppercase font-mono">VIP Translator Suite</span>
+        <div>
+          <span class="font-extrabold text-sm tracking-wide text-white block leading-tight">LORE VISION</span>
+          <span class="text-[9px] text-neonCyan font-mono tracking-wider block">VIP TRANSLATOR SUITE</span>
         </div>
-      </a>
-
-      <!-- Desktop Links -->
-      <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-neonCyan transition-colors">Tính Năng Cốt Lõi</a>
-        <a href="#interactive-sandbox" class="hover:text-neonEmerald transition-colors flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-neonEmerald animate-pulse"></span>
-          Bộ Công Cụ Online
-        </a>
-        <a href="#ai-engine" class="hover:text-neonCyan transition-colors">Trạm AI Đa Tầng</a>
-        <a href="#script-market" class="hover:text-neonCyan transition-colors">Chợ Plugin JS</a>
-        <a href="#download" class="hover:text-neonAmber transition-colors">Tải App (APK)</a>
       </div>
 
-      <!-- Action Button -->
       <div class="flex items-center space-x-3">
-        <a href="#download" class="relative group overflow-hidden rounded-xl p-px font-semibold text-xs text-white shadow-2xl">
-          <span class="absolute inset-0 bg-gradient-to-r from-neonCyan via-neonPurple to-neonEmerald transition-all duration-300 group-hover:opacity-90"></span>
-          <span class="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950 transition-colors group-hover:bg-slate-900">
-            <i data-lucide="download" class="w-4 h-4 text-neonCyan"></i>
-            <span>Tải App (APK)</span>
-          </span>
+        <a href="#features" class="hidden sm:block text-xs font-medium text-slate-300 hover:text-white transition-colors">Tính Năng</a>
+        <a href="#guide" class="hidden sm:block text-xs font-medium text-slate-300 hover:text-white transition-colors">Cài Đặt</a>
+        
+        <!-- NÚT TẢI HEADER: ĐẶT LINK DRIVE CỦA BẠN VÀO HREF DƯỚI ĐÂY -->
+        <a href="https://drive.google.com/uc?export=download&id=YOUR_DRIVE_FILE_ID_HERE" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-neonCyan to-neonPurple text-slate-950 font-extrabold text-xs flex items-center gap-1.5 shadow-md shadow-cyan-500/20 active:scale-95 transition-all">
+          <i data-lucide="download" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+          <span>Tải APK</span>
         </a>
       </div>
     </div>
-  </nav>
+  </header>
 
   <!-- ========================================================================= -->
-  <!-- 2. HERO SECTION                                                           -->
+  <!-- 2. HERO SECTION (TẬP TRUNG TẢI APP)                                      -->
   <!-- ========================================================================= -->
-  <section class="relative pt-16 pb-24 overflow-hidden bg-grid-pattern">
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-obsidian/70 to-obsidian pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      
-      <!-- Badges -->
-      <div class="flex flex-wrap justify-center items-center gap-3 mb-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-semibold text-neonCyan">
-          <span class="w-2 h-2 rounded-full bg-neonCyan"></span>
-          Lore Vision v3.8 • Native Android + AI
-        </div>
-        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-xs font-semibold text-neonEmerald">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-          Không Quảng Cáo • Zero-Knowledge
-        </div>
+  <section class="px-4 pt-8 pb-12 max-w-4xl mx-auto text-center">
+    
+    <!-- Huy hiệu phiên bản -->
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-appSurface border border-appBorder text-xs font-semibold text-neonCyan mb-5 shadow-inner">
+      <span class="w-2 h-2 rounded-full bg-neonEmerald animate-pulse"></span>
+      <span>Phiên bản v3.8 • Android 7.0+ • Miễn Phí</span>
+    </div>
+
+    <!-- Tiêu đề chính -->
+    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-4 tracking-tight">
+      Trình Duyệt Đọc Truyện & <br />
+      <span class="bg-gradient-to-r from-neonCyan via-neonPurple to-neonGold bg-clip-text text-transparent">
+        Dịch Thuật AI Toàn Năng
+      </span>
+    </h1>
+
+    <p class="text-sm sm:text-base text-slate-300 max-w-xl mx-auto mb-8 leading-relaxed">
+      Dịch liên hoàn ngữ cảnh mượt mà • Nghe Podcast Audio nền 24/7 khi tắt màn hình • Tự do đọc mọi nguồn web không quảng cáo • Tự viết Tool & Plugin JS theo ý muốn.
+    </p>
+
+    <!-- KHỐI TẢI APP CHÍNH (CALL TO ACTION) -->
+    <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-appCard to-appSurface border border-neonCyan/30 glow-cyan max-w-md mx-auto mb-10 text-left relative overflow-hidden">
+      <div class="flex items-center justify-between pb-3 border-b border-appBorder text-xs text-slate-400">
+        <span class="font-mono flex items-center gap-1.5 text-neonEmerald font-bold">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> An toàn 100%
+        </span>
+        <span>Dung lượng: ~48 MB</span>
       </div>
 
-      <!-- Hero Title -->
-      <div class="text-center max-w-4xl mx-auto">
-        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight mb-6">
-          Đọc Tự Do Mọi Nguồn Web.<br />
-          <span class="bg-gradient-to-r from-neonCyan via-neonPurple to-neonRose bg-clip-text text-transparent">
-            Dịch AI Ngữ Cảnh & Nghe Nền 24/7.
-          </span>
-        </h1>
-        <p class="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Không chỉ là trình duyệt — Lore Vision là một trạm làm việc toàn năng: Tự động trích xuất mục lục, dịch liên hoàn qua 12+ cổng AI, nghe podcast giọng người thật và tự tạo tiện ích JS theo ý thích.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <!-- Thay link Drive của bạn vào href bên dưới -->
-          <a id="hero-download-btn" href="#download" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-neonCyan to-neonPurple text-slate-950 font-extrabold text-base flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 hover:opacity-95 transition-all">
-            <i data-lucide="download" class="w-5 h-5 text-slate-900"></i>
-            <span>Tải Ngay APK (Google Drive)</span>
-          </a>
-
-          <a href="#interactive-sandbox" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900/90 border border-slate-700 hover:border-neonCyan text-white font-bold text-base flex items-center justify-center gap-2 transition-all">
-            <i data-lucide="play-circle" class="w-5 h-5 text-neonEmerald"></i>
-            <span>Thử Đọc, Nghe & Dịch Online</span>
-          </a>
-        </div>
+      <div class="py-4">
+        <h3 class="text-base font-extrabold text-white mb-1">Tải Bản Cài Đặt Trực Tiếp (APK)</h3>
+        <p class="text-xs text-slate-400">Lưu trữ trên Google Drive tốc độ cao, cài đặt ngay không cần Root máy.</p>
       </div>
 
-      <!-- Live Mockup Visualizer -->
-      <div class="mt-16 max-w-5xl mx-auto rounded-3xl border border-slate-800 bg-surface/90 shadow-2xl overflow-hidden glow-cyan">
-        <div class="h-10 bg-slate-900/90 border-b border-slate-800 px-4 flex items-center justify-between text-xs text-slate-400 font-mono">
+      <!-- ĐẶT LINK GOOGLE DRIVE CỦA BẠN VÀO THUỘC TÍNH HREF DƯỚI ĐÂY -->
+      <a href="https://drive.google.com/uc?export=download&id=YOUR_DRIVE_FILE_ID_HERE" target="_blank" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-neonCyan via-neonPurple to-neonGold text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 active:scale-95 hover:opacity-95 transition-all">
+        <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
+        <span>TẢI VỀ TỪ GOOGLE DRIVE</span>
+      </a>
+    </div>
+
+    <!-- Mockup Giao Diện Điện Thoại Mô Phỏng -->
+    <div class="max-w-xs sm:max-w-sm mx-auto rounded-[36px] p-3 bg-gradient-to-b from-slate-700 via-appBorder to-slate-900 shadow-2xl border border-slate-700">
+      <div class="rounded-[28px] bg-appDark overflow-hidden border border-slate-800 p-4 text-left space-y-3 font-mono text-xs">
+        <div class="flex items-center justify-between text-[10px] text-slate-500 pb-2 border-b border-slate-800">
+          <span>09:41</span>
+          <span class="text-neonCyan flex items-center gap-1">● 5G • 100%</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-appCard border border-appBorder">
+          <div class="text-[10px] text-neonGold font-bold mb-1">🤖 AI GHOST TRANSLATOR</div>
+          <div class="text-slate-200 text-xs font-serif leading-snug">"Chương 15: Đại Đạo Vô Tình. Vương Lâm hít sâu một hơi, vận chuyển linh lực..."</div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-appSurface border border-neonEmerald/40 flex items-center justify-between">
           <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-            <span class="ml-2 text-slate-300">lore://app_hub/reading_mode_ai.js</span>
+            <i data-lucide="headphones" class="w-4 h-4 text-neonEmerald"></i>
+            <span class="text-[11px] text-white font-bold">Audio Nền + Tiếng Mưa</span>
           </div>
-          <div class="flex items-center gap-3 text-neonEmerald">
-            <span class="inline-flex items-center gap-1">● Ghost Translator: Active</span>
-            <span class="text-neonCyan">TTS Engine: Ready</span>
-          </div>
-        </div>
-
-        <!-- App Features Showcase Matrix Inside Mockup -->
-        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-950/70">
-          <div class="p-5 rounded-2xl bg-card/70 border border-slate-800 flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-xl bg-neonPurple/20 text-neonPurple flex items-center justify-center mb-3">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
-              </div>
-              <h3 class="font-bold text-white text-base mb-1">Dịch AI Ghi Nhớ Ngữ Cảnh</h3>
-              <p class="text-xs text-slate-400 leading-relaxed">Tự học tên nhân vật, cảnh giới, đại từ xưng hô (ta-ngươi, hắn-nàng) đồng bộ toàn bộ tác phẩm.</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] font-mono text-neonCyan">
-              +12 Cổng: Agnes, Gemini, DeepSeek, OpenAI
-            </div>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-card/70 border border-slate-800 flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-xl bg-neonEmerald/20 text-neonEmerald flex items-center justify-center mb-3">
-                <i data-lucide="headphones" class="w-5 h-5"></i>
-              </div>
-              <h3 class="font-bold text-white text-base mb-1">Audio TTS Nền & Âm Cảnh</h3>
-              <p class="text-xs text-slate-400 leading-relaxed">Đọc mượt mà khi tắt màn hình. Trộn âm thanh mưa rơi, gió rít, lửa trại như podcast chuyên nghiệp.</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] font-mono text-neonEmerald">
-              Edge TTS AI • Valtec • Google Voice
-            </div>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-card/70 border border-slate-800 flex flex-col justify-between">
-            <div>
-              <div class="w-10 h-10 rounded-xl bg-neonCyan/20 text-neonCyan flex items-center justify-center mb-3">
-                <i data-lucide="code-2" class="w-5 h-5"></i>
-              </div>
-              <h3 class="font-bold text-white text-base mb-1">Sáng Tạo & Viết Tool Tự Do</h3>
-              <p class="text-xs text-slate-400 leading-relaxed">Hỗ trợ API mở như Tampermonkey. Can thiệp DOM, viết script cào web, chia sẻ lên chợ cộng đồng.</p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] font-mono text-neonAmber">
-              LoreAPI Sandbox • Mini App Runner
-            </div>
-          </div>
+          <span class="w-2 h-2 rounded-full bg-neonEmerald animate-ping"></span>
         </div>
       </div>
-
     </div>
+
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 3. INTERACTIVE WEB UTILITIES (SANDBOX TRỰC TIẾP TRÊN WEB)                 -->
+  <!-- 3. TÍNH NĂNG NỔI BẬT NHẤT (VÌ SAO BẠN NÊN CÀI APP)                         -->
   <!-- ========================================================================= -->
-  <section id="interactive-sandbox" class="py-20 bg-surface/60 border-y border-slate-800/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section id="features" class="px-4 py-12 max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <h2 class="text-xl sm:text-3xl font-black text-white mb-2">Đặc Quyền Vô Hạn Khi Dùng App</h2>
+      <p class="text-xs sm:text-sm text-slate-400">Những tính năng mà các trình duyệt và web đọc truyện thông thường không làm được</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       
-      <div class="text-center max-w-3xl mx-auto mb-12">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neonEmerald/10 text-neonEmerald border border-neonEmerald/30 text-xs font-bold mb-3">
-          <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
-          TRẢI NGHIỆM TRỰC TUYẾN
+      <!-- Card 1 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-neonCyan transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-neonCyan/10 text-neonCyan flex items-center justify-center mb-3.5">
+          <i data-lucide="bot" class="w-5 h-5"></i>
         </div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-          Công Cụ Mở EPUB, Nghe Audio & Dịch AI
-        </h2>
-        <p class="text-sm sm:text-base text-slate-400">
-          Bạn có thể thử nghiệm ngay các tính năng cốt lõi của app ngay trên trình duyệt: Kéo thả file EPUB/TXT để giải nén, dịch bằng API Key cá nhân và nghe thử âm giọng Google TTS.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Dịch AI Ghi Nhớ Ngữ Cảnh</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Tự động học tên riêng, cảnh giới và duy trì xưng hô xuyên suốt (ta-ngươi, hắn-nàng). Hỗ trợ kết nối hơn 12 cổng AI: Gemini, DeepSeek, OpenAI, Groq.
         </p>
       </div>
 
-      <!-- Tab Switcher -->
-      <div class="max-w-4xl mx-auto mb-8 flex flex-wrap justify-center gap-3">
-        <button id="tab-btn-epub" onclick="switchSandboxTab('epub')" class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all bg-neonCyan text-slate-950 flex items-center gap-2">
-          <i data-lucide="book-open" class="w-4 h-4"></i>
-          1. Trình Mở & Đọc EPUB/TXT
-        </button>
-        <button id="tab-btn-ai" onclick="switchSandboxTab('ai')" class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all bg-card border border-slate-700 text-slate-300 hover:text-white flex items-center gap-2">
-          <i data-lucide="bot" class="w-4 h-4"></i>
-          2. Dịch Thuật Bằng AI Key
-        </button>
-        <button id="tab-btn-tts" onclick="switchSandboxTab('tts')" class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all bg-card border border-slate-700 text-slate-300 hover:text-white flex items-center gap-2">
-          <i data-lucide="volume-2" class="w-4 h-4"></i>
-          3. Trình Nghe Audio TTS
-        </button>
-      </div>
-
-      <!-- Tab 1: EPUB / TXT Reader & Parser Sandbox -->
-      <div id="sandbox-tab-epub" class="max-w-4xl mx-auto bg-card rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-xl">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="file-text" class="w-5 h-5 text-neonCyan"></i>
-              Giải Nén & Bóc Tách File EPUB/TXT Offline
-            </h3>
-            <p class="text-xs text-slate-400 mt-1">Dữ liệu được xử lý 100% bằng JavaScript nội bộ trên máy bạn, không tải file lên server.</p>
-          </div>
-
-          <label class="px-4 py-2.5 rounded-xl bg-neonCyan/20 hover:bg-neonCyan/30 border border-neonCyan/40 text-neonCyan font-bold text-xs cursor-pointer transition-all flex items-center gap-2">
-            <i data-lucide="upload" class="w-4 h-4"></i>
-            <span>Chọn File EPUB / TXT</span>
-            <input type="file" id="epub-file-input" accept=".epub,.txt" class="hidden" onchange="handleFileUpload(event)" />
-          </label>
+      <!-- Card 2 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-neonEmerald transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-neonEmerald/10 text-neonEmerald flex items-center justify-center mb-3.5">
+          <i data-lucide="headphones" class="w-5 h-5"></i>
         </div>
-
-        <!-- Chapter Selector & Content Display -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="md:col-span-1 bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80">
-            <div class="flex items-center justify-between mb-3 text-xs font-bold text-slate-400">
-              <span>MỤC LỤC CHƯƠNG (<span id="chapter-count">0</span>)</span>
-            </div>
-            <div id="chapter-list" class="max-h-72 overflow-y-auto space-y-1.5 pr-1 text-xs text-slate-300">
-              <div class="text-slate-500 italic p-2">Chưa có file nào được nạp. Hãy chọn một file .epub hoặc .txt mẫu.</div>
-            </div>
-          </div>
-
-          <div class="md:col-span-2 bg-slate-950/60 rounded-2xl p-4 sm:p-6 border border-slate-800/80 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <h4 id="current-chapter-title" class="text-sm font-bold text-neonAmber truncate">Nội dung xem trước</h4>
-                <div class="flex items-center space-x-2">
-                  <button onclick="sendToTtsSandbox()" title="Nghe đoạn này" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-neonEmerald text-xs flex items-center gap-1">
-                    <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
-                    <span>Nghe TTS</span>
-                  </button>
-                  <button onclick="sendToAiSandbox()" title="Dịch đoạn này" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-neonCyan text-xs flex items-center gap-1">
-                    <i data-lucide="bot" class="w-3.5 h-3.5"></i>
-                    <span>Dịch AI</span>
-                  </button>
-                </div>
-              </div>
-              <div id="epub-text-viewer" class="max-h-64 overflow-y-auto text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2 pr-2 font-serif select-text">
-                Chào mừng bạn đến với bộ giải nén EPUB của Lore Vision. Hãy nhấn nút "Chọn File EPUB / TXT" ở trên để giải nén trực tiếp toàn bộ các chương và đoạn văn ngay trên trình duyệt.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab 2: AI Translation Sandbox -->
-      <div id="sandbox-tab-ai" class="hidden max-w-4xl mx-auto bg-card rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-xl">
-        <div class="pb-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="sparkles" class="w-5 h-5 text-neonPurple"></i>
-              Trình Dịch AI Thuật Ngữ & Ngữ Cảnh
-            </h3>
-            <p class="text-xs text-slate-400 mt-1">Hỗ trợ API Key cá nhân (Gemini, DeepSeek, OpenAI, Groq). Key lưu an toàn trong máy bạn.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <select id="ai-provider-select" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neonCyan" onchange="updateAiEndpointHint()">
-              <option value="gemini">Google Gemini (Miễn phí)</option>
-              <option value="openai">OpenAI (GPT-4o/5)</option>
-              <option value="deepseek">DeepSeek AI</option>
-              <option value="groq">Groq (Llama 3.3 siêu tốc)</option>
-              <option value="custom">Custom Endpoint</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mt-6 space-y-4">
-          <!-- API Key Input -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">API Key của bạn:</label>
-              <div class="relative">
-                <input type="password" id="ai-api-key" placeholder="AIzaSy... / sk-..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-neonPurple" />
-                <button type="button" onclick="togglePasswordVisibility('ai-api-key')" class="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300">
-                  <i data-lucide="eye" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Model chỉ định:</label>
-              <input type="text" id="ai-model-name" value="gemini-2.5-flash" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-neonPurple" />
-            </div>
-          </div>
-
-          <!-- Dual Text Translation Box -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Văn bản gốc (Trung, Anh, Hàn...):</label>
-              <textarea id="ai-source-text" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-neonPurple leading-relaxed font-serif" placeholder="Dán văn bản tiếng Trung hoặc tiếng Anh cần dịch vào đây...">第七章 炼气三层
-王林深吸口气，双目微闭，脑海中浮现出凝气篇的口诀。随着灵气的运转，他感觉体内有一股微弱的热流，正缓缓顺着经脉游走。</textarea>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Bản dịch tiếng Việt (AI Thoát Ý):</label>
-              <textarea id="ai-target-text" rows="7" readonly class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 text-xs sm:text-sm text-neonEmerald focus:outline-none leading-relaxed font-serif" placeholder="Kết quả dịch ngữ cảnh mượt mà sẽ hiển thị tại đây..."></textarea>
-            </div>
-          </div>
-
-          <!-- Execute Translation Button -->
-          <div class="flex items-center justify-between pt-2">
-            <div id="ai-status-msg" class="text-xs text-slate-400 italic">Sẵn sàng dịch.</div>
-            <button onclick="executeAiTranslate()" id="btn-do-translate" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-neonPurple to-neonCyan text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 hover:opacity-90">
-              <i data-lucide="zap" class="w-4 h-4 text-slate-950"></i>
-              <span>Kích Hoạt Dịch AI</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab 3: TTS Audio Reader Sandbox -->
-      <div id="sandbox-tab-tts" class="hidden max-w-4xl mx-auto bg-card rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-xl">
-        <div class="pb-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="volume-2" class="w-5 h-5 text-neonEmerald"></i>
-              Trình Nghe Thử Audio TTS & Điều Khiển Tốc Độ
-            </h3>
-            <p class="text-xs text-slate-400 mt-1">Sử dụng động cơ Web Speech API mô phỏng công nghệ đọc truyện thông minh của app.</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <span id="tts-indicator" class="w-3 h-3 rounded-full bg-slate-600"></span>
-            <span id="tts-status-text" class="text-xs font-mono text-slate-400">Đang dừng</span>
-          </div>
-        </div>
-
-        <div class="mt-6 space-y-5">
-          <!-- Text to Read -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Văn bản cần đọc thử:</label>
-            <textarea id="tts-input-text" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-neonEmerald leading-relaxed font-serif">Chương 7: Luyện Khí Tầng Ba. Vương Lâm hít sâu một hơi, khép hờ đôi mắt. Trong đầu hắn lập tức hiện lên khẩu quyết của Ngưng Khí Thiên. Theo từng luồng linh khí vận chuyển, hắn cảm giác trong cơ thể có một dòng nhiệt lưu yếu ớt, đang chậm rãi lưu chuyển dọc theo các kinh mạch.</textarea>
-          </div>
-
-          <!-- Controls: Voice & Speed -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Giọng đọc hệ thống:</label>
-              <select id="tts-voice-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neonEmerald">
-                <option value="">Đang nạp giọng máy...</option>
-              </select>
-            </div>
-
-            <div>
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-400 mb-1">
-                <span>Tốc độ đọc:</span>
-                <span id="tts-speed-val" class="text-neonEmerald font-mono font-bold">1.0x</span>
-              </div>
-              <input type="range" id="tts-speed-slider" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full accent-neonEmerald cursor-pointer" oninput="document.getElementById('tts-speed-val').innerText = this.value + 'x'" />
-            </div>
-          </div>
-
-          <!-- Playback Action Buttons -->
-          <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <button onclick="playTtsDemo()" class="px-6 py-3 rounded-2xl bg-neonEmerald hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
-              <i data-lucide="play" class="w-4 h-4 text-slate-950 fill-current"></i>
-              <span>Phát Audio TTS</span>
-            </button>
-            <button onclick="pauseTtsDemo()" class="px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 border border-slate-700 transition-all">
-              <i data-lucide="pause" class="w-4 h-4 text-slate-300"></i>
-              <span>Tạm Dừng</span>
-            </button>
-            <button onclick="stopTtsDemo()" class="px-5 py-3 rounded-2xl bg-rose-950/40 hover:bg-rose-900/60 text-neonRose font-bold text-xs sm:text-sm flex items-center gap-2 border border-rose-800/40 transition-all">
-              <i data-lucide="square" class="w-4 h-4 text-neonRose"></i>
-              <span>Dừng Hẳn</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- 4. DETAILED APP FEATURES MATRIX                                           -->
-  <!-- ========================================================================= -->
-  <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neonPurple/10 text-neonPurple border border-neonPurple/30 text-xs font-bold mb-3">
-        ĐẶC QUYỀN VÔ HẠN
-      </div>
-      <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4">
-        Được Xây Dựng Cho Độc Giả Khó Tính Nhất
-      </h2>
-      <p class="text-slate-400 text-sm sm:text-base">
-        Mọi tính năng trong Lore Vision đều giải quyết trực diện những khó chịu khi đọc truyện web: từ quảng cáo rác, dịch máy vô hồn, đến việc mất mạch đọc khi tắt màn hình.
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      
-      <!-- Feature 1 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-neonCyan transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-neonCyan/10 text-neonCyan flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="ghost" class="w-6 h-6"></i>
-        </div>
-        <h3 class="text-xl font-bold text-white mb-2">Bóng Ma Dịch Liên Hoàn</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Đặc vụ chạy ngầm tự động tìm nút "Chương sau", dịch trước 5-7 chương gối đầu vào bộ đệm, giúp bạn lật trang mượt mà không phải chờ đợi AI xử lý từng giây.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Podcast Audio Nền 24/7</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Đọc truyện mượt mà khi tắt màn hình hoặc chuyển sang ứng dụng khác. Cho phép hòa trộn âm thanh môi trường như tiếng mưa rơi, gió rít, lửa trại.
         </p>
       </div>
 
-      <!-- Feature 2 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-neonEmerald transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-neonEmerald/10 text-neonEmerald flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="headphones" class="w-6 h-6"></i>
+      <!-- Card 3 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-neonPurple transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-neonPurple/10 text-neonPurple flex items-center justify-center mb-3.5">
+          <i data-lucide="message-square" class="w-5 h-5"></i>
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">Podcast Đọc Nền 24/7</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Động cơ TTS bỏ qua tối ưu pin hệ thống, tự động nhảy chương vô tận khi tắt màn hình. Hòa trộn âm thanh môi trường: tiếng mưa, gió rít, lửa trại ấm cúng.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Bong Bóng Nổi Lore Vision</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Thu nhỏ trình duyệt thành bong bóng nổi xuyên thấu. Vừa lướt TikTok, chơi game, vừa theo dõi bản dịch và điều khiển âm thanh trên màn hình.
         </p>
       </div>
 
-      <!-- Feature 3 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-neonPurple transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-neonPurple/10 text-neonPurple flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="message-square" class="w-6 h-6"></i>
+      <!-- Card 4 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-neonRose transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-neonRose/10 text-neonRose flex items-center justify-center mb-3.5">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">Bong Bóng Nổi Lore Vision</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Thu nhỏ trình duyệt thành bong bóng nổi xuyên thấu. Vừa chơi game, lướt mạng xã hội vừa theo dõi bản dịch và điều khiển phát audio ngay trên màn hình chính.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Mắt Thần & Sổ Tử Thần</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Chặn đứng 100% quảng cáo cờ bạc, popup che màn hình và bẫy chuyển hướng lừa đảo. Bạn có thể tự chạm tay xóa sạch bất kỳ phần tử rác nào trên web.
         </p>
       </div>
 
-      <!-- Feature 4 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-rose-500 transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="shield-alert" class="w-6 h-6"></i>
+      <!-- Card 5 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-neonGold transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-neonGold/10 text-neonGold flex items-center justify-center mb-3.5">
+          <i data-lucide="code-2" class="w-5 h-5"></i>
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">Mắt Thần & Sổ Tử Thần</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          AI nén DOM để diệt sạch bẫy click-jack, lớp phủ tàng hình, popup cờ bạc. Hỗ trợ chế độ "Chỉ định tay" xóa vĩnh viễn bất kỳ phần tử rác nào trên trang web.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Tự Do Sáng Tạo Tool JS</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Tích hợp môi trường thực thi UserScript chuẩn Tampermonkey. Dễ dàng tự viết script can thiệp trang web hoặc cài đặt tiện ích từ Chợ Cộng Đồng.
         </p>
       </div>
 
-      <!-- Feature 5 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-neonAmber transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-neonAmber/10 text-neonAmber flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="code" class="w-6 h-6"></i>
+      <!-- Card 6 -->
+      <div class="p-5 rounded-3xl bg-appSurface border border-appBorder hover:border-sky-400 transition-all">
+        <div class="w-10 h-10 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-3.5">
+          <i data-lucide="folder-archive" class="w-5 h-5"></i>
         </div>
-        <h3 class="text-xl font-bold text-white mb-2">Hệ Sinh Thái JS & Tampermonkey</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Tích hợp sẵn LoreAPI chuẩn cho lập trình viên: can thiệp clipboard, rung, tải file, kết nối mạng vượt CORS và đăng tải mã tiện ích lên Chợ Community.
-        </p>
-      </div>
-
-      <!-- Feature 6 -->
-      <div class="p-8 rounded-3xl bg-surface border border-slate-800 hover:border-sky-400 transition-all group">
-        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <i data-lucide="cloud-cog" class="w-6 h-6"></i>
-        </div>
-        <h3 class="text-xl font-bold text-white mb-2">Sao Lưu Drive Ẩn 15GB</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Mã hóa Zero-Knowledge bằng Argon2id + AES-256 trước khi lưu vào thư mục ẩn Google Drive. Toàn bộ kho truyện, ghi chú và từ điển được bảo toàn tuyệt đối.
+        <h3 class="text-sm sm:text-base font-extrabold text-white mb-1.5">Trạm Cào Tàng Kinh Các</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Tự động rã đông EPUB, trích xuất văn bản từ link web, sắp xếp chương thông minh và sao lưu mã hóa Zero-Knowledge lên Google Drive an toàn.
         </p>
       </div>
 
@@ -515,442 +228,90 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 5. DOWNLOAD & INSTALL GUIDE SECTION                                       -->
+  <!-- 4. HƯỚNG DẪN CÀI ĐẶT 3 BƯỚC (RÕ RÀNG CHO NGƯỜI DÙNG)                    -->
   <!-- ========================================================================= -->
-  <section id="download" class="py-24 bg-gradient-to-b from-obsidian via-surface to-obsidian border-t border-slate-800/80">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="p-8 sm:p-12 rounded-3xl bg-card/90 border border-slate-700 shadow-2xl relative overflow-hidden">
-        <!-- Glow accents -->
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-neonCyan/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-neonPurple/10 rounded-full blur-3xl pointer-events-none"></div>
+  <section id="guide" class="px-4 py-12 max-w-4xl mx-auto">
+    <div class="p-6 sm:p-8 rounded-3xl bg-appSurface border border-appBorder">
+      <h2 class="text-lg sm:text-2xl font-black text-white mb-6 text-center">Hướng Dẫn Cài Đặt File APK Trong 1 Phút</h2>
 
-        <div class="relative z-10 text-center max-w-3xl mx-auto">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-neonCyan to-neonPurple text-slate-950 flex items-center justify-center mx-auto mb-6 shadow-xl">
-            <i data-lucide="smartphone" class="w-8 h-8"></i>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <div class="p-4 rounded-2xl bg-appCard border border-appBorder flex flex-col justify-between">
+          <div>
+            <span class="w-7 h-7 rounded-xl bg-neonCyan/20 text-neonCyan font-extrabold text-xs flex items-center justify-center mb-3">1</span>
+            <h3 class="text-xs font-bold text-white mb-1">Tải File APK</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Bấm vào nút "Tải APK" để tải bộ cài đặt từ Google Drive về điện thoại.</p>
           </div>
-
-          <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4">
-            Tải Ngay Lore Vision Cho Android
-          </h2>
-          <p class="text-slate-300 text-sm sm:text-base mb-8 leading-relaxed">
-            Ứng dụng độc lập hoàn toàn, không yêu cầu cấp quyền theo dõi cá nhân, hỗ trợ Android 7.0 trở lên (tối ưu hóa đặc biệt cho Android 10, 12, 14+).
-          </p>
-
-          <!-- Download Action Card -->
-          <div class="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 max-w-xl mx-auto mb-8 text-left">
-            <div class="flex items-center justify-between text-xs text-slate-400 pb-3 border-b border-slate-800">
-              <span class="font-mono">Tập tin: LoreVision_VIP_v3.8.apk</span>
-              <span class="text-neonEmerald font-bold">Bản chính thức</span>
-            </div>
-            <div class="py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <div class="text-white font-bold text-sm">Tải qua Google Drive tốc độ cao</div>
-                <div class="text-xs text-slate-400">Dung lượng ~48 MB • Quét mã độc sạch 100%</div>
-              </div>
-
-              <!-- 🌟 ĐẶT LINK GOOGLE DRIVE CỦA BẠN VÀO THUỘC TÍNH HREF DƯỚI ĐÂY -->
-              <a href="https://drive.google.com/uc?export=download&id=YOUR_DRIVE_FILE_ID_HERE" target="_blank" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-neonCyan hover:bg-cyan-300 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span>Tải APK Ngay</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- 3 Steps Installation -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-4">
-            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div class="text-neonCyan font-extrabold text-xs mb-1">BƯỚC 1</div>
-              <div class="text-xs text-slate-300">Tải file APK từ link Google Drive về máy điện thoại.</div>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div class="text-neonPurple font-extrabold text-xs mb-1">BƯỚC 2</div>
-              <div class="text-xs text-slate-300">Cho phép "Cài đặt ứng dụng từ nguồn không xác định" nếu được hỏi.</div>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div class="text-neonEmerald font-extrabold text-xs mb-1">BƯỚC 3</div>
-              <div class="text-xs text-slate-300">Mở app, dán API Key AI và bắt đầu tận hưởng kho tàng đọc truyện!</div>
-            </div>
-          </div>
-
         </div>
+
+        <div class="p-4 rounded-2xl bg-appCard border border-appBorder flex flex-col justify-between">
+          <div>
+            <span class="w-7 h-7 rounded-xl bg-neonPurple/20 text-neonPurple font-extrabold text-xs flex items-center justify-center mb-3">2</span>
+            <h3 class="text-xs font-bold text-white mb-1">Cho Phép Cài Đặt</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Mở file vừa tải, nếu hệ thống hỏi hãy chọn "Cho phép cài đặt từ nguồn này".</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-appCard border border-appBorder flex flex-col justify-between">
+          <div>
+            <span class="w-7 h-7 rounded-xl bg-neonEmerald/20 text-neonEmerald font-extrabold text-xs flex items-center justify-center mb-3">3</span>
+            <h3 class="text-xs font-bold text-white mb-1">Mở App & Thưởng Thức</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Khởi động Lore Vision, dán link web truyện yêu thích và bắt đầu trải nghiệm!</p>
+          </div>
+        </div>
+
       </div>
 
+      <!-- Nút tải lại trong khung hướng dẫn -->
+      <div class="mt-8 text-center">
+        <a href="https://drive.google.com/uc?export=download&id=YOUR_DRIVE_FILE_ID_HERE" target="_blank" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-neonCyan to-neonPurple text-slate-950 font-black text-sm shadow-lg shadow-cyan-500/20 active:scale-95 transition-all">
+          <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>Tải Bản Cài Đặt Ngay (.APK)</span>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- ========================================================================= -->
-  <!-- 6. FOOTER & SAFE HARBOR LEGAL DISCLAIMER                                  -->
+  <!-- 5. FOOTER & ĐIỀU KHOẢN PHÁP LÝ (SAFE HARBOR)                             -->
   <!-- ========================================================================= -->
-  <footer class="py-12 bg-obsidian border-t border-slate-800 text-xs text-slate-400">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center space-x-2">
-          <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-neonPurple to-neonCyan flex items-center justify-center font-bold text-[10px] text-slate-900">
-            L✦R
-          </div>
-          <span class="text-sm font-bold text-white">Lore Vision Suite © 2026</span>
-        </div>
-        <div class="flex items-center space-x-6 text-slate-400">
-          <a href="#features" class="hover:text-white">Tính Năng</a>
-          <a href="#interactive-sandbox" class="hover:text-white">Công Cụ Online</a>
-          <a href="#download" class="hover:text-white">Tải APK</a>
-        </div>
+  <footer class="px-4 py-8 max-w-4xl mx-auto border-t border-appBorder text-center text-xs text-slate-500 space-y-4">
+    <div class="flex items-center justify-center space-x-2 text-slate-400 font-bold">
+      <div class="w-5 h-5 rounded-lg bg-gradient-to-tr from-neonPurple to-neonCyan flex items-center justify-center text-[10px] text-slate-950 font-black">
+        L✦R
       </div>
-
-      <!-- Safe Harbor Disclaimer matching AppConfig in Kotlin -->
-      <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] leading-relaxed text-slate-400">
-        <span class="text-neonAmber font-bold">THỎA THUẬN CÔNG CỤ & BẾN CẢNG AN TOÀN (SAFE HARBOR DISCLAIMER):</span>
-        Lore Vision là ứng dụng tiện ích phía máy khách (Client-Side Utility Tool) hoạt động trên thiết bị người dùng. Ứng dụng không vận hành máy chủ lưu trữ tài liệu, không chủ động phát tán nội dung của bên thứ ba. Người dùng tự chịu trách nhiệm về các liên kết (URL), đoạn mã JavaScript hoặc API Key cấu hình cá nhân. Tuân thủ Điều 198b Luật SHTT Việt Nam & 17 U.S.C. § 512 (DMCA).
-      </div>
+      <span>Lore Vision Suite © 2026</span>
     </div>
+
+    <p class="text-[11px] leading-relaxed max-w-2xl mx-auto">
+      <strong class="text-slate-400">Bến Cảng An Toàn (Safe Harbor Disclaimer):</strong> Ứng dụng là công cụ phần mềm phía máy khách (Client-Side Utility) hỗ trợ duyệt web, tối ưu hiển thị và trích xuất dữ liệu cục bộ. Hệ thống không lưu trữ hay phát tán nội dung của bên thứ ba. Tuân thủ Điều 198b Luật SHTT Việt Nam & DMCA.
+    </p>
   </footer>
 
   <!-- ========================================================================= -->
-  <!-- JAVASCRIPT LOGIC CHO CÁC CÔNG CỤ TRỰC TUYẾN (SANDBOX LOGIC)               -->
+  <!-- 6. THANH TẢI GHIM CỐ ĐỊNH Ở ĐÁY MÀN HÌNH ĐIỆN THOẠI (STICKY BOTTOM BAR)   -->
   <!-- ========================================================================= -->
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-appDark/95 backdrop-blur-md border-t border-appBorder p-3 px-4 flex items-center justify-between sm:hidden shadow-2xl">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-neonPurple to-neonCyan flex items-center justify-center font-black text-xs text-slate-950">
+        APK
+      </div>
+      <div>
+        <div class="text-xs font-bold text-white leading-tight">Lore Vision v3.8</div>
+        <div class="text-[10px] text-neonEmerald">Miễn phí • Android 7.0+</div>
+      </div>
+    </div>
+
+    <!-- ĐẶT LINK GOOGLE DRIVE CỦA BẠN VÀO THUỘC TÍNH HREF DƯỚI ĐÂY -->
+    <a href="https://drive.google.com/uc?export=download&id=YOUR_DRIVE_FILE_ID_HERE" target="_blank" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neonCyan via-neonPurple to-neonGold text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
+      <i data-lucide="download" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+      <span>Tải App Ngay</span>
+    </a>
+  </div>
+
   <script>
-    // Initialize Lucide Icons
+    // Khởi tạo các biểu tượng icon Lucide
     lucide.createIcons();
-
-    // -------------------------------------------------------------
-    // Tab Navigation for Sandbox
-    // -------------------------------------------------------------
-    function switchSandboxTab(tab) {
-      const tabs = ['epub', 'ai', 'tts'];
-      tabs.forEach(t => {
-        const btn = document.getElementById('tab-btn-' + t);
-        const content = document.getElementById('sandbox-tab-' + t);
-        if (t === tab) {
-          content.classList.remove('hidden');
-          btn.className = "px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all bg-neonCyan text-slate-950 flex items-center gap-2 shadow-lg shadow-cyan-500/10";
-        } else {
-          content.classList.add('hidden');
-          btn.className = "px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all bg-card border border-slate-700 text-slate-300 hover:text-white flex items-center gap-2";
-        }
-      });
-      lucide.createIcons();
-    }
-
-    // -------------------------------------------------------------
-    // 1. EPUB & TXT File Extractor Engine (Using JSZip client-side)
-    // -------------------------------------------------------------
-    let parsedChapters = [];
-
-    async function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const fileName = file.name.toLowerCase();
-      const chapterListEl = document.getElementById('chapter-list');
-      const chapterCountEl = document.getElementById('chapter-count');
-      const viewerEl = document.getElementById('epub-text-viewer');
-      const titleEl = document.getElementById('current-chapter-title');
-
-      chapterListEl.innerHTML = '<div class="text-neonCyan text-xs p-2 animate-pulse">⏳ Đang phân tích file...</div>';
-      parsedChapters = [];
-
-      try {
-        if (fileName.endsWith('.txt')) {
-          const text = await file.text();
-          // Split by Chapter/Chương regex
-          const rawChunks = text.split(/\n(?=(?:chương|chapter|hồi|tiết|vol|chap|第)\s*\d+)/i);
-          
-          if (rawChunks.length > 1) {
-            rawChunks.forEach((chunk, idx) => {
-              const lines = chunk.trim().split('\n');
-              const chTitle = lines[0].substring(0, 60);
-              const chContent = lines.slice(1).join('\n').trim();
-              parsedChapters.push({ title: chTitle || `Phần ${idx+1}`, content: chContent || chunk });
-            });
-          } else {
-            parsedChapters.push({ title: file.name, content: text });
-          }
-        } else if (fileName.endsWith('.epub')) {
-          const zip = await JSZip.loadAsync(file);
-          const htmlFiles = [];
-
-          // Find all HTML/XHTML chapters
-          zip.forEach((relativePath, zipEntry) => {
-            if (relativePath.endsWith('.html') || relativePath.endsWith('.xhtml')) {
-              htmlFiles.push(zipEntry);
-            }
-          });
-
-          // Sort files naturally
-          htmlFiles.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
-
-          let chIndex = 1;
-          for (const zipEntry of htmlFiles) {
-            const rawHtml = await zipEntry.async('text');
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(rawHtml, 'text/html');
-
-            // Remove scripts and styles
-            doc.querySelectorAll('script, style, head').forEach(e => e.remove());
-            
-            const headings = doc.querySelector('h1, h2, h3, title');
-            const chTitle = headings ? headings.innerText.trim() : `Chương ${chIndex}`;
-            
-            // Clean paragraph text
-            const paragraphs = Array.from(doc.querySelectorAll('p, div'))
-              .map(p => p.innerText.trim())
-              .filter(t => t.length > 0);
-            
-            const fullContent = paragraphs.length > 0 ? paragraphs.join('\n\n') : doc.body.innerText.trim();
-
-            if (fullContent.length > 50) {
-              parsedChapters.push({ title: chTitle, content: fullContent });
-              chIndex++;
-            }
-          }
-        }
-
-        // Render chapter list
-        chapterCountEl.innerText = parsedChapters.length;
-        chapterListEl.innerHTML = '';
-
-        if (parsedChapters.length === 0) {
-          chapterListEl.innerHTML = '<div class="text-rose-400 text-xs p-2">Không tìm thấy nội dung văn bản hợp lệ.</div>';
-          return;
-        }
-
-        parsedChapters.forEach((ch, index) => {
-          const btn = document.createElement('button');
-          btn.className = `w-full text-left p-2 rounded-lg truncate transition-colors ${index === 0 ? 'bg-neonCyan/20 text-neonCyan font-bold' : 'hover:bg-slate-800'}`;
-          btn.innerText = ch.title;
-          btn.onclick = () => selectChapter(index);
-          chapterListEl.appendChild(btn);
-        });
-
-        // Show first chapter
-        selectChapter(0);
-
-      } catch (err) {
-        chapterListEl.innerHTML = `<div class="text-rose-400 text-xs p-2">Lỗi giải nén: ${err.message}</div>`;
-      }
-    }
-
-    function selectChapter(index) {
-      if (!parsedChapters[index]) return;
-      const ch = parsedChapters[index];
-      document.getElementById('current-chapter-title').innerText = ch.title;
-      
-      const paragraphs = ch.content.split('\n\n').map(p => `<p class="mb-2">${p.trim()}</p>`).join('');
-      document.getElementById('epub-text-viewer').innerHTML = paragraphs || ch.content;
-
-      // Highlight in list
-      const buttons = document.querySelectorAll('#chapter-list button');
-      buttons.forEach((btn, idx) => {
-        if (idx === index) {
-          btn.className = 'w-full text-left p-2 rounded-lg truncate bg-neonCyan/20 text-neonCyan font-bold';
-        } else {
-          btn.className = 'w-full text-left p-2 rounded-lg truncate hover:bg-slate-800 text-slate-300';
-        }
-      });
-    }
-
-    function sendToTtsSandbox() {
-      const text = document.getElementById('epub-text-viewer').innerText;
-      if (!text) return;
-      document.getElementById('tts-input-text').value = text.substring(0, 1000);
-      switchSandboxTab('tts');
-      playTtsDemo();
-    }
-
-    function sendToAiSandbox() {
-      const text = document.getElementById('epub-text-viewer').innerText;
-      if (!text) return;
-      document.getElementById('ai-source-text').value = text.substring(0, 1500);
-      switchSandboxTab('ai');
-    }
-
-    // -------------------------------------------------------------
-    // 2. Client-side AI Translation Engine (Gemini / OpenAI / Groq)
-    // -------------------------------------------------------------
-    function updateAiEndpointHint() {
-      const provider = document.getElementById('ai-provider-select').value;
-      const modelInput = document.getElementById('ai-model-name');
-      if (provider === 'gemini') modelInput.value = 'gemini-2.5-flash';
-      else if (provider === 'deepseek') modelInput.value = 'deepseek-chat';
-      else if (provider === 'groq') modelInput.value = 'llama-3.3-70b-versatile';
-      else if (provider === 'openai') modelInput.value = 'gpt-4o-mini';
-    }
-
-    function togglePasswordVisibility(id) {
-      const el = document.getElementById(id);
-      el.type = el.type === 'password' ? 'text' : 'password';
-    }
-
-    async function executeAiTranslate() {
-      const apiKey = document.getElementById('ai-api-key').value.trim();
-      const model = document.getElementById('ai-model-name').value.trim();
-      const sourceText = document.getElementById('ai-source-text').value.trim();
-      const provider = document.getElementById('ai-provider-select').value;
-      const statusEl = document.getElementById('ai-status-msg');
-      const targetEl = document.getElementById('ai-target-text');
-      const btn = document.getElementById('btn-do-translate');
-
-      if (!apiKey) {
-        alert("Vui lòng nhập API Key cá nhân của bạn để thử nghiệm.");
-        return;
-      }
-      if (!sourceText) {
-        alert("Vui lòng nhập đoạn văn bản cần dịch.");
-        return;
-      }
-
-      statusEl.innerText = "⏳ Đang kết nối máy chủ AI...";
-      statusEl.className = "text-xs text-neonCyan italic animate-pulse";
-      btn.disabled = true;
-      targetEl.value = "";
-
-      const systemPrompt = `Bạn là Dịch Giả Tiểu Thuyết Chuyên Nghiệp. Hãy dịch đầy đủ đoạn văn bản sau sang tiếng Việt trôi chảy, đúng văn phong kiếm hiệp/tiên hiệp/đô thị. Xưng hô chuẩn ngữ cảnh (ta-ngươi, hắn-nàng). Không tóm tắt, không chèn markdown code block.\n\nVăn bản gốc:\n${sourceText}`;
-
-      try {
-        let result = "";
-
-        if (provider === 'gemini') {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: systemPrompt }] }],
-              generationConfig: { temperature: 0.3 }
-            })
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error.message);
-          result = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        } else {
-          // OpenAI / DeepSeek / Groq standard endpoint
-          let endpoint = "https://api.openai.com/v1/chat/completions";
-          if (provider === 'deepseek') endpoint = "https://api.deepseek.com/v1/chat/completions";
-          if (provider === 'groq') endpoint = "https://api.groq.com/openai/v1/chat/completions";
-
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-              model: model,
-              messages: [{ role: 'user', content: systemPrompt }],
-              temperature: 0.3
-            })
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error.message);
-          result = data.choices?.[0]?.message?.content || "";
-        }
-
-        targetEl.value = result.trim();
-        statusEl.innerText = "✅ Dịch hoàn tất thành công!";
-        statusEl.className = "text-xs text-neonEmerald font-bold";
-
-      } catch (err) {
-        statusEl.innerText = `❌ Lỗi: ${err.message}`;
-        statusEl.className = "text-xs text-rose-400 font-bold";
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    // -------------------------------------------------------------
-    // 3. Web Speech TTS Audio Engine Sandbox
-    // -------------------------------------------------------------
-    let currentUtterance = null;
-    const synth = window.speechSynthesis;
-
-    function populateVoiceList() {
-      if (!synth) return;
-      const voices = synth.getVoices();
-      const select = document.getElementById('tts-voice-select');
-      select.innerHTML = '';
-
-      const viVoices = voices.filter(v => v.lang.includes('vi') || v.lang.includes('VI'));
-      const otherVoices = voices.filter(v => !v.lang.includes('vi') && !v.lang.includes('VI'));
-
-      const all = [...viVoices, ...otherVoices];
-      all.forEach(voice => {
-        const option = document.createElement('option');
-        option.textContent = `${voice.name} (${voice.lang})`;
-        option.value = voice.name;
-        if (voice.lang.includes('vi')) option.selected = true;
-        select.appendChild(option);
-      });
-    }
-
-    if (synth) {
-      populateVoiceList();
-      if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = populateVoiceList;
-      }
-    }
-
-    function playTtsDemo() {
-      if (!synth) {
-        alert("Trình duyệt của bạn không hỗ trợ Web Speech TTS.");
-        return;
-      }
-
-      synth.cancel();
-      const text = document.getElementById('tts-input-text').value.trim();
-      if (!text) return;
-
-      currentUtterance = new SpeechSynthesisUtterance(text);
-      const speed = parseFloat(document.getElementById('tts-speed-slider').value) || 1.0;
-      currentUtterance.rate = speed;
-
-      const selectedVoiceName = document.getElementById('tts-voice-select').value;
-      const voices = synth.getVoices();
-      const voice = voices.find(v => v.name === selectedVoiceName);
-      if (voice) currentUtterance.voice = voice;
-
-      const statusText = document.getElementById('tts-status-text');
-      const indicator = document.getElementById('tts-indicator');
-
-      currentUtterance.onstart = () => {
-        statusText.innerText = "Đang phát Audio...";
-        statusText.className = "text-xs font-mono text-neonEmerald";
-        indicator.className = "w-3 h-3 rounded-full bg-neonEmerald animate-ping";
-      };
-
-      currentUtterance.onend = () => {
-        statusText.innerText = "Đã hoàn thành";
-        statusText.className = "text-xs font-mono text-slate-400";
-        indicator.className = "w-3 h-3 rounded-full bg-slate-600";
-      };
-
-      currentUtterance.onerror = () => {
-        statusText.innerText = "Lỗi âm thanh";
-        indicator.className = "w-3 h-3 rounded-full bg-rose-500";
-      };
-
-      synth.speak(currentUtterance);
-    }
-
-    function pauseTtsDemo() {
-      if (synth && synth.speaking) {
-        if (synth.paused) {
-          synth.resume();
-          document.getElementById('tts-status-text').innerText = "Đang phát...";
-        } else {
-          synth.pause();
-          document.getElementById('tts-status-text').innerText = "Tạm dừng";
-        }
-      }
-    }
-
-    function stopTtsDemo() {
-      if (synth) {
-        synth.cancel();
-        document.getElementById('tts-status-text').innerText = "Đã dừng";
-        document.getElementById('tts-indicator').className = "w-3 h-3 rounded-full bg-slate-600";
-      }
-    }
   </script>
 </body>
 </html>
